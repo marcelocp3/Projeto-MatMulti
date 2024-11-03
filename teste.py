@@ -1,5 +1,5 @@
 import numpy as np
-import itertools
+from scipy.spatial import KDTree
 
 # Parâmetros e curva paramétrica
 passo = 0.001
@@ -16,16 +16,21 @@ tolerancia = 0.01
 # Lista para armazenar pontos de interseção
 pontos_intersecao = []
 
-# Verificando pares de pontos na curva para encontrar interseções
-for i, j in itertools.combinations(range(len(t)), 2):
-    if abs(i - j) > 1:  # Ignora pontos adjacentes
-        distancia = np.sqrt((x_t[i] - x_t[j])**2 + (y_t[i] - y_t[j])**2)
-        if distancia < tolerancia:
-            ponto_intersecao = ((x_t[i] + x_t[j]) / 2, (y_t[i] + y_t[j]) / 2)
+# Construindo a árvore de busca espacial com os pontos (x_t, y_t)
+pontos = np.vstack((x_t, y_t)).T
+tree = KDTree(pontos)
+
+# Encontrando pares de pontos próximos usando a tolerância
+for i, ponto in enumerate(pontos):
+    indices = tree.query_ball_point(ponto, tolerancia)
+    for j in indices:
+        if i < j and abs(i - j) > 1:  # Ignora pontos adjacentes
+            ponto_intersecao = ((ponto[0] + pontos[j][0]) / 2, (ponto[1] + pontos[j][1]) / 2)
             if ponto_intersecao not in pontos_intersecao:  # Evita duplicatas
                 pontos_intersecao.append(ponto_intersecao)
 
 # Exibindo os pontos de auto-interseção encontrados
+
 print(f"Valor de u + v = {valor_a}")
 print("Pontos de auto-interseção:")
 for ponto in pontos_intersecao:

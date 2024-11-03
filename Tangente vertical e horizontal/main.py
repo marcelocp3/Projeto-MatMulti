@@ -22,7 +22,7 @@ def funcY(t: float) -> float:
 
 # Parâmetros de intervalo
 start = 0
-end = 2 * np.pi
+end = 6 * np.pi
 interval = 0.01
 
 def main(curva):
